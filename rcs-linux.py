@@ -276,4 +276,3 @@ def bruteforce_decrypt(ciphertext):
 if __name__ == "__main__":
     load_keys() 
     interactive_mode()
-
