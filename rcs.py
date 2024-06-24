@@ -254,7 +254,7 @@ def bruteforce_decrypt(ciphertext):
     min_length = int(input("Enter minimum key length: "))
     max_length = int(input("Enter maximum key length: "))
 
-    with open("/home/RinCynar/Desktop/opt.md", "w") as output_file:
+    with open("opt.md", "w") as output_file:
         for length in range(min_length, max_length + 1):
             print(f"Trying keys of length {length}...")
             for attempt in itertools.product(character_set, repeat=length):
