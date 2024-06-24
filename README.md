@@ -1,14 +1,14 @@
-# RCS 1.22 - Text encryption and decryption tool
+# RCS 1.44 - Text encryption and decryption tool
 
 ## Introduction
 
-RCS 1.22 is a text encryption and decryption tool developed based on the RC4 encryption algorithm. It is designed to provide users with a simple and powerful encryption solution, supporting multiple key management methods and efficient decryption functions, and is equipped with a powerful brute force cracking tool for decrypting unknown ciphertext.
+RCS 1.44 is a text encryption and decryption tool developed based on the RC4 encryption algorithm. It is designed to provide users with a simple and powerful encryption solution, supporting multiple key management methods and efficient decryption functions, and is equipped with a powerful brute force cracking tool for decrypting unknown ciphertext.
 
 ## Main functions and features
 
 ### Encryption and decryption operations
 
-RCS 1.22 provides an intuitive command line interface and supports the following core functions:
+RCS 1.44 provides an intuitive command line interface and supports the following core functions:
 
 - **Encryption**: Users can choose to use the default key or a custom key to encrypt the input text. The encryption process is based on the RC4 algorithm, which can quickly and efficiently encrypt text data and protect the user's privacy information.
 
@@ -16,7 +16,7 @@ RCS 1.22 provides an intuitive command line interface and supports the following
 
 ### Key Management and Configuration
 
-RCS 1.22 allows users to flexibly manage the keys used in the encryption process:
+RCS 1.44 allows users to flexibly manage the keys used in the encryption process:
 
 - **Add Key**: Users can use the command `rcs-adk <new-key>` to add new encryption keys, expand encryption options, and improve security.
 
@@ -26,11 +26,11 @@ RCS 1.22 allows users to flexibly manage the keys used in the encryption process
 
 ### Brute Force Cracking Function
 
-RCS 1.22 provides a powerful brute force cracking tool for trying to decrypt unknown ciphertext. This function allows users to specify the key length range, and the system will try all possible key combinations until the correct decryption key is found. This provides an effective solution for users to solve the problem of forgetting the key or encountering encrypted text that cannot be decrypted.
+RCS 1.44 provides a powerful brute force cracking tool for trying to decrypt unknown ciphertext. This function allows users to specify the key length range, and the system will try all possible key combinations until the correct decryption key is found. This provides an effective solution for users to solve the problem of forgetting the key or encountering encrypted text that cannot be decrypted.
 
 ### Instructions and command list
 
-RCS 1.22 has designed a simple and feature-rich command line interface to help users easily complete encryption and decryption operations:
+RCS 1.44 has designed a simple and feature-rich command line interface to help users easily complete encryption and decryption operations:
 
 - `rcs-help`: Displays the tool's instructions and command list to help users get started quickly.
 
@@ -46,8 +46,8 @@ RCS 1.22 has designed a simple and feature-rich command line interface to help u
 
 ### Technical details and implementation
 
-RCS 1.22 is developed using the Python programming language and implements the RC4 encryption algorithm using the third-party library ARC4. It is compatible with multiple operating systems, including Windows, Mac, and Linux. It uses UTF-16BE encoding to process text data to ensure compatibility and stability on different platforms.
+RCS 1.44 is developed using the Python programming language and implements the RC4 encryption algorithm using the third-party library ARC4. It is compatible with multiple operating systems, including Windows, Mac, and Linux. It uses UTF-16BE encoding to process text data to ensure compatibility and stability on different platforms.
 
 ### Next steps
 
-We are committed to continuously optimizing RCS 1.22 to improve its security, stability, and user experience. In the future, we plan to introduce more advanced encryption algorithms and customized functions to meet the diverse needs of different users for data security.
+We are committed to continuously optimizing RCS 1.44 to improve its security, stability, and user experience. In the future, we plan to introduce more advanced encryption algorithms and customized functions to meet the diverse needs of different users for data security.
