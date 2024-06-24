@@ -127,7 +127,7 @@ def choose_key_for_decryption():
 
 def interactive_mode():
     print("")
-    print("rcs 1.22, a text encryption tool based on RC4 encryption algorithm")
+    print("rcs 1.44, a text encryption tool based on RC4 encryption algorithm")
     print("http://rcva.san.tc, Rin' Cynar")
     print("Type 'rcs-help' for usage instructions")
     print("")
@@ -149,7 +149,7 @@ def interactive_mode():
             elif user_input.startswith('rcs-dek'):
                 parts = user_input.split()
                 if len(parts) == 2 and parts[0] == 'rcs-dek' and parts[1].startswith('-'):
-                    key_number = parts[1][1:]  # Remove the leading '-'
+                    key_number = parts[1][1:] 
                     delete_key(key_number)
                 else:
                     print("")
@@ -228,7 +228,6 @@ def decrypt_text(user_input):
         try:
             key_bytes = utf16be_to_bytes(key)
             plaintext_bytes = rc4_decrypt(key_bytes, ciphertext_bytes)
-            # Correct decoding of plaintext bytes
             decrypted_text = plaintext_bytes.decode('utf-16be').rstrip('\x00')
             decryption_results.append(f"Decrypted text with key {key[:3]}: {decrypted_text}")
         except Exception as e:
@@ -251,20 +250,17 @@ def encrypt_text(plaintext):
     print("")
 
 def bruteforce_decrypt(ciphertext):
-    character_set = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-
-    # 询问用户最小和最大密钥长度
+    character_set = "`~!@#$%^&*()-=_+[]\\{}|;':"",./<>?0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     min_length = int(input("Enter minimum key length: "))
     max_length = int(input("Enter maximum key length: "))
 
-    with open("opt.md", "w") as output_file:
+    with open("/home/RinCynar/Desktop/opt.md", "w") as output_file:
         for length in range(min_length, max_length + 1):
             print(f"Trying keys of length {length}...")
             for attempt in itertools.product(character_set, repeat=length):
                 key = ''.join(attempt)
                 try:
                     decrypted_text = rc4_decrypt(utf16be_to_bytes(key), hex_to_bytes(ciphertext))
-                    # Correct decoding of plaintext bytes
                     decrypted_text = decrypted_text.decode('utf-16be').rstrip('\x00')
                     output_file.write(f"Key: {key}, Decrypted text: {decrypted_text}\n")
                 except Exception as e:
@@ -275,3 +271,4 @@ def bruteforce_decrypt(ciphertext):
 if __name__ == "__main__":
     load_keys() 
     interactive_mode()
+
