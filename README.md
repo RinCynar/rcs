@@ -1,8 +1,8 @@
-# rcs 1.52 - RC4-based text encryption tool
+# rcs - RC4-based text encryption tool
 
 Welcome to the official website of `rcs` tool software! `rcs` is a powerful text encryption tool based on the RC4 encryption algorithm, with a simple design and easy to use. Whether you need to protect sensitive information or are interested in encryption technology, `rcs` is your ideal choice.
 
-## Latest version: 1.52
+## Latest version:
 
 ### Features
 
@@ -103,9 +103,9 @@ Key added: MyNewKey
 
 # Check for updates
 # rcs-udt
-This version is 1.52.
+This version is x.xx
 Connecting to rcva.san.tc
-Latest version: 1.52
+Latest version: x.xx
 ```
 
 ### Support and feedback
