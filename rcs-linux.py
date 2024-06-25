@@ -10,7 +10,8 @@ KEYS = [DEFAULT_KEY]
 KEY_FILE = ".rcs_keys"
 HISTORY_FILE = ".rcs_hst"
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.52
+RCS_VER = 1.55
+DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcs.py"
 UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
 
 def print_message(message):
@@ -143,7 +144,7 @@ def check_for_updates():
         response = requests.get(UPDATE_URL)
         response.raise_for_status()
         latest_version = response.text.strip()
-        print_message(f"This version is {RCS_VER}.\nConnecting to rcva.san.tc\nLatest version: {latest_version}")
+        print_message(f"This version is {RCS_VER}.\nConnecting to rcva.san.tc\nLatest version: {latest_version},{DOWNLOAD_LINK}")
     except requests.RequestException as e:
         print_message(f"This version is {RCS_VER}.\nConnecting to rcva.san.tc\nCan't Connect to rcva.san.tc, check your internet connection\n{e}")
 
