@@ -9,7 +9,7 @@ KEYS = [DEFAULT_KEY]
 KEY_FILE = ".rcs_keys"
 HISTORY_FILE = ".rcs_hst"
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.55
+RCS_VER = 1.56
 DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcs.py"
 UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
 
@@ -142,10 +142,10 @@ def check_for_updates():
     try:
         response = requests.get(UPDATE_URL)
         response.raise_for_status()
-        latest_version = response.text.strip()
-        print_message(f"This version is {RCS_VER}.\nConnecting to rcva.san.tc\nLatest version: {latest_version},{DOWNLOAD_LINK}")
-    except requests.RequestException as e:
-        print_message(f"This version is {RCS_VER}.\nConnecting to rcva.san.tc\nCan't Connect to rcva.san.tc, check your internet connection\n{e}")
+        latest_version = float(response.text.strip())
+        return latest_version
+    except requests.RequestException:
+        return None
 
 def handle_command(user_input):
     if user_input.lower() == 'rcs-exi':
@@ -175,7 +175,14 @@ def handle_command(user_input):
     elif user_input.lower() == 'rcs-cle':
         clear_history()
     elif user_input.lower() == 'rcs-udt':
-        check_for_updates()
+        latest_version = check_for_updates()
+        if latest_version:
+            if latest_version > RCS_VER:
+                print_message(f"New version {latest_version} is available! Download it here: {DOWNLOAD_LINK}")
+            else:
+                print_message("You are using the latest version.")
+        else:
+            print_message("Failed to check for updates.")
     elif user_input.startswith('- '):
         decrypt_text(user_input)
     else:
@@ -184,6 +191,12 @@ def handle_command(user_input):
 
 def interactive_mode():
     print_message(f"rcs {RCS_VER}, a text encryption tool based on RC4 encryption algorithm\nhttp://rcva.san.tc, Rin' Cynar\nType 'rcs-help' for usage instructions")
+
+    latest_version = check_for_updates()
+    if latest_version:
+        if latest_version > RCS_VER:
+            print_message(f"A new version {latest_version} is available! Download it here: {DOWNLOAD_LINK}")
+    
     while True:
         try:
             user_input = input("# ").strip()
@@ -244,25 +257,6 @@ def encrypt_text(plaintext):
     ciphertext_hex = bytes_to_hex(ciphertext_bytes)
     print_message(f"Encrypted text: {ciphertext_hex}")
     save_history(f"Encrypted text: {ciphertext_hex} with key {key[:3]}")
-
-def bruteforce_decrypt(ciphertext):
-    character_set = "`~!@#$%^&*()-=_+[]\\{}|;':"",./<>?0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    min_length = int(input("Enter minimum key length: "))
-    max_length = int(input("Enter maximum key length: "))
-
-    with open(OPT_FILE, "w") as output_file:
-        for length in range(min_length, max_length + 1):
-            print(f"Trying keys of length {length}...")
-            for attempt in itertools.product(character_set, repeat=length):
-                key = ''.join(attempt)
-                try:
-                    decrypted_text = rc4_decrypt(utf16be_to_bytes(key), hex_to_bytes(ciphertext))
-                    decrypted_text = decrypted_text.decode('utf-16be').rstrip('\x00')
-                    output_file.write(f"Key: {key}, Decrypted text: {decrypted_text}\n")
-                except Exception as e:
-                    continue
-
-    print("Bruteforce decryption completed. Results saved in rcs_opt.md")
 
 if __name__ == "__main__":
     load_keys()
