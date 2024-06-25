@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 import sys
 import os
+import itertools
+import requests
 from arc4 import ARC4
 
 DEFAULT_KEY = "DEF-4164E792FC9AD1C9C866B3D6DCC79A27"
 KEYS = [DEFAULT_KEY]
 KEY_FILE = ".rcs_keys"
 HISTORY_FILE = ".rcs_hst"
+OPT_FILE = "rcs_opt.md"
+UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
 
 def load_keys():
     global KEYS
@@ -158,9 +162,27 @@ def clear_history():
         print("No history records to clear.")
         print("")
 
+def check_for_updates():
+    try:
+        response = requests.get(UPDATE_URL)
+        response.raise_for_status()
+        latest_version = response.text.strip()
+        print("")
+        print("This version is 1.52.")
+        print("Connecting to rcva.san.tc")
+        print(f"Latest version: {latest_version}")
+        print("")
+    except requests.RequestException as e:
+        print("")
+        print("This version is 1.52")
+        print("Connecting to rcva.san.tc")
+        print("Can't Connect to rcva.san.tc, check your internet connection")
+        print(f"{e}")
+        print("")
+
 def interactive_mode():
     print("")
-    print("rcs 1.49, a text encryption tool based on RC4 encryption algorithm")
+    print("rcs 1.52, a text encryption tool based on RC4 encryption algorithm")
     print("http://rcva.san.tc, Rin' Cynar")
     print("Type 'rcs-help' for usage instructions")
     print("")
@@ -197,10 +219,8 @@ def interactive_mode():
                 display_keys()
 
             elif user_input.startswith('rcs-pod'):
-                parts = user_input.split(' ', 1)
-                if len(parts) == 2:
-                    text = parts[1]
-                    brute_force_decrypt(text)
+                text_to_crack = user_input.split(' ', 1)[1]
+                bruteforce_decrypt(text_to_crack)
 
             elif user_input.lower() == 'rcs-hst':
                 print("")
@@ -208,6 +228,9 @@ def interactive_mode():
 
             elif user_input.lower() == 'rcs-cle':
                 clear_history()
+
+            elif user_input.lower() == 'rcs-udt':
+                check_for_updates()
 
             elif user_input.startswith('- '):
                 decrypt_text(user_input)
@@ -232,6 +255,7 @@ def print_help():
     print("Type 'rcs-hst' to display encryption/decryption history.")
     print("Type 'rcs-pod <text>' to perform a brute force decryption on the specified text.")
     print("Type 'rcs-res' to reset default configuration.")
+    print("Type 'rcs-udt' to check for updates.")
     print("")
 
 def display_keys():
@@ -295,24 +319,25 @@ def encrypt_text(plaintext):
     print("")
     save_history(f"Encrypted text: {ciphertext_hex} with key {key[:3]}")
 
-def brute_force_decrypt(text):
-    charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    min_len = int(input("Enter minimum key length: ").strip())
-    max_len = int(input("Enter maximum key length: ").strip())
+def bruteforce_decrypt(ciphertext):
+    character_set = "`~!@#$%^&*()-=_+[]\\{}|;':"",./<>?0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    min_length = int(input("Enter minimum key length: "))
+    max_length = int(input("Enter maximum key length: "))
 
-    ciphertext_bytes = hex_to_bytes(text)
+    with open(OPT_FILE, "w") as output_file:
+        for length in range(min_length, max_length + 1):
+            print(f"Trying keys of length {length}...")
+            for attempt in itertools.product(character_set, repeat=length):
+                key = ''.join(attempt)
+                try:
+                    decrypted_text = rc4_decrypt(utf16be_to_bytes(key), hex_to_bytes(ciphertext))
+                    decrypted_text = decrypted_text.decode('utf-16be').rstrip('\x00')
+                    output_file.write(f"Key: {key}, Decrypted text: {decrypted_text}\n")
+                except Exception as e:
+                    continue
 
-    for length in range(min_len, max_len + 1):
-        for key in generate_keys(charset, length):
-            try:
-                key_bytes = utf16be_to_bytes(key)
-                plaintext_bytes = rc4_decrypt(key_bytes, ciphertext_bytes)
-                decrypted_text = plaintext_bytes.decode('utf-16be')
-                result = f"Key: {key}, Decrypted text: {decrypted_text}"
-                print(result)
-                save_history(result)
-            except Exception:
-                continue
+    print("Bruteforce decryption completed. Results saved in rcs_opt.md")
+
 
 def generate_keys(charset, length):
     if length == 0:
