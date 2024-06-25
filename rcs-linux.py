@@ -12,6 +12,15 @@ HISTORY_FILE = ".rcs_hst"
 OPT_FILE = "rcs_opt.md"
 UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
 
+def print_message(message):
+    print("")
+    print(message)
+    print("")
+
+def get_input(prompt, default=None):
+    user_input = input(prompt).strip()
+    return user_input if user_input else default
+
 def load_keys():
     global KEYS
     try:
@@ -34,22 +43,16 @@ def reset_keys():
         pass
     KEYS = [DEFAULT_KEY]
     save_keys()
-    print("")
-    print("Restoring default configuration completed.")
-    print("")
+    print_message("Restoring default configuration completed.")
 
 def add_key(new_key):
     global KEYS
     if new_key not in KEYS:
         KEYS.append(new_key)
         save_keys()
-        print("")
-        print(f"Key added: {new_key}")
-        print("")
+        print_message(f"Key added: {new_key}")
     else:
-        print("")
-        print(f"Key '{new_key}' already exists.")
-        print("")
+        print_message(f"Key '{new_key}' already exists.")
 
 def delete_key(key_number):
     global KEYS
@@ -57,23 +60,15 @@ def delete_key(key_number):
         key_number = int(key_number)
         if 0 <= key_number < len(KEYS):
             if KEYS[key_number] == DEFAULT_KEY:
-                print("")
-                print("Cannot delete the default key.")
-                print("")
+                print_message("Cannot delete the default key.")
             else:
                 deleted_key = KEYS.pop(key_number)
                 save_keys()
-                print("")
-                print(f"Key deleted: {deleted_key}")
-                print("")
+                print_message(f"Key deleted: {deleted_key}")
         else:
-            print("")
-            print(f"Invalid key number: {key_number}")
-            print("")
+            print_message(f"Invalid key number: {key_number}")
     except ValueError:
-        print("")
-        print(f"Invalid key number: {key_number}")
-        print("")
+        print_message(f"Invalid key number: {key_number}")
 
 def utf16be_to_bytes(s):
     return s.encode('utf-16be')
@@ -96,38 +91,26 @@ def hex_to_bytes(h):
 
 def choose_key_for_encryption():
     global KEYS
-    print("")
-    print("Available keys for encryption:")
-    print("")
+    print_message("Available keys for encryption:")
     for i, key in enumerate(KEYS):
         print(f"{i}-{key[:3]}")
 
-    choice = input("Choose a key number (default is 0): ").strip()
-    if choice == "":
-        return KEYS[0]
+    choice = get_input("Choose a key number (default is 0): ", "0")
     try:
         index = int(choice)
         if 0 <= index < len(KEYS):
             return KEYS[index]
         else:
-            print("")
-            print("Invalid choice, using default key.")
-            print("")
-            return KEYS[0]
+            raise ValueError
     except ValueError:
-        print("")
-        print("Invalid choice, using default key.")
-        print("")
+        print_message("Invalid choice, using default key.")
         return KEYS[0]
 
 def choose_key_for_decryption():
     global KEYS
-    print("")
-    print("Trying keys in order:")
-    print("")
+    print_message("Trying keys in order:")
     for i, key in enumerate(KEYS):
         print(f"{i}-{key[:3]}")
-
     return KEYS
 
 def save_history(record):
@@ -139,140 +122,88 @@ def display_history():
         with open(HISTORY_FILE, "r") as file:
             history = file.readlines()
             if not history:
-                print("")
-                print("No history records found.")
-                print("")
+                print_message("No history records found.")
             else:
                 for line in history:
                     print(line.strip())
                     print("")
     except FileNotFoundError:
-        print("")
-        print("No history records found.")
-        print("")
+        print_message("No history records found.")
 
 def clear_history():
     try:
         os.remove(HISTORY_FILE)
-        print("")
-        print("History records cleared.")
-        print("")
+        print_message("History records cleared.")
     except FileNotFoundError:
-        print("")
-        print("No history records to clear.")
-        print("")
+        print_message("No history records to clear.")
 
 def check_for_updates():
     try:
         response = requests.get(UPDATE_URL)
         response.raise_for_status()
         latest_version = response.text.strip()
-        print("")
-        print("This version is 1.52.")
-        print("Connecting to rcva.san.tc")
-        print(f"Latest version: {latest_version}")
-        print("")
+        print_message(f"This version is 1.52.\nConnecting to rcva.san.tc\nLatest version: {latest_version}")
     except requests.RequestException as e:
+        print_message(f"This version is 1.52\nConnecting to rcva.san.tc\nCan't Connect to rcva.san.tc, check your internet connection\n{e}")
+
+def handle_command(user_input):
+    if user_input.lower() == 'rcs-exi':
+        return False
+    elif user_input.lower() == 'rcs-help':
+        print_help()
+    elif user_input.startswith('rcs-adk'):
+        new_key = user_input.split(' ', 1)[1]
+        add_key(new_key)
+    elif user_input.startswith('rcs-dek'):
+        parts = user_input.split()
+        if len(parts) == 2 and parts[0] == 'rcs-dek' and parts[1].startswith('-'):
+            key_number = parts[1][1:]
+            delete_key(key_number)
+        else:
+            print_message("Invalid input format for rcs-dek command. Format should be: rcs-dek -<key_number>")
+    elif user_input.lower() == 'rcs-res':
+        reset_keys()
+    elif user_input.lower() == 'rcs-cuk':
+        display_keys()
         print("")
-        print("This version is 1.52")
-        print("Connecting to rcva.san.tc")
-        print("Can't Connect to rcva.san.tc, check your internet connection")
-        print(f"{e}")
-        print("")
+    elif user_input.startswith('rcs-pod'):
+        text_to_crack = user_input.split(' ', 1)[1]
+        bruteforce_decrypt(text_to_crack)
+    elif user_input.lower() == 'rcs-hst':
+        display_history()
+    elif user_input.lower() == 'rcs-cle':
+        clear_history()
+    elif user_input.lower() == 'rcs-udt':
+        check_for_updates()
+    elif user_input.startswith('- '):
+        decrypt_text(user_input)
+    else:
+        encrypt_text(user_input)
+    return True
 
 def interactive_mode():
-    print("")
-    print("rcs 1.52, a text encryption tool based on RC4 encryption algorithm")
-    print("http://rcva.san.tc, Rin' Cynar")
-    print("Type 'rcs-help' for usage instructions")
-    print("")
-
+    print_message("rcs 1.52, a text encryption tool based on RC4 encryption algorithm\nhttp://rcva.san.tc, Rin' Cynar\nType 'rcs-help' for usage instructions")
     while True:
         try:
             user_input = input("# ").strip()
-
-            if user_input.lower() == 'rcs-exi':
+            if not handle_command(user_input):
                 break
-
-            elif user_input.lower() == 'rcs-help':
-                print_help()
-                
-            elif user_input.startswith('rcs-adk'):
-                new_key = user_input.split(' ', 1)[1]
-                add_key(new_key)
-
-            elif user_input.startswith('rcs-dek'):
-                parts = user_input.split()
-                if len(parts) == 2 and parts[0] == 'rcs-dek' and parts[1].startswith('-'):
-                    key_number = parts[1][1:]  # Remove the leading '-'
-                    delete_key(key_number)
-                else:
-                    print("")
-                    print("Invalid input format for rcs-dek command.")
-                    print("Format should be: rcs-dek -<key_number>")
-                    print("")
-
-            elif user_input.lower() == 'rcs-res':
-                reset_keys()
-
-            elif user_input.lower() == 'rcs-cuk':
-                display_keys()
-
-            elif user_input.startswith('rcs-pod'):
-                text_to_crack = user_input.split(' ', 1)[1]
-                bruteforce_decrypt(text_to_crack)
-
-            elif user_input.lower() == 'rcs-hst':
-                print("")
-                display_history()
-
-            elif user_input.lower() == 'rcs-cle':
-                clear_history()
-
-            elif user_input.lower() == 'rcs-udt':
-                check_for_updates()
-
-            elif user_input.startswith('- '):
-                decrypt_text(user_input)
-
-            else:
-                encrypt_text(user_input)
-
         except Exception as e:
-            print("")
-            print(f"Error: {str(e)}")
-            print("")
+            print_message(f"Error: {str(e)}")
 
 def print_help():
-    print("")
-    print("Provide the text and press 'Enter', rcs will automatically perform the encryption work, you can choose the key to use for encryption, or just simply press 'Enter' again to use the default options.")
-    print("Enter '- <text> -<key_number>' and press Enter, rcs will use the key you specified to decrypt. Of course, you can choose to simply enter '- <text>', rcs will try all the keys that have been saved and return the results.")
-    print("Type 'rcs-adk <new-key>' to add a new encryption key.")
-    print("Type 'rcs-cle' to clear encryption/decryption history.")
-    print("Type 'rcs-cuk' to display the currently saved encryption keys")
-    print("Type 'rcs-dek -<key_number>' to delete a specified encryption key.")
-    print("Type 'rcs-exi' to exit.")
-    print("Type 'rcs-hst' to display encryption/decryption history.")
-    print("Type 'rcs-pod <text>' to perform a brute force decryption on the specified text.")
-    print("Type 'rcs-res' to reset default configuration.")
-    print("Type 'rcs-udt' to check for updates.")
-    print("")
+    print_message("Provide the text and press 'Enter', rcs will automatically perform the encryption work, you can choose the key to use for encryption, or just simply press 'Enter' again to use the default options.\nEnter '- <text> -<key_number>' and press Enter, rcs will use the key you specified to decrypt. Of course, you can choose to simply enter '- <text>', rcs will try all the keys that have been saved and return the results.\nType 'rcs-adk <new-key>' to add a new encryption key.\nType 'rcs-cle' to clear encryption/decryption history.\nType 'rcs-cuk' to display the currently saved encryption keys\nType 'rcs-dek -<key_number>' to delete a specified encryption key.\nType 'rcs-exi' to exit.\nType 'rcs-hst' to display encryption/decryption history.\nType 'rcs-pod <text>' to perform a brute force decryption on the specified text.\nType 'rcs-res' to reset default configuration.\nType 'rcs-udt' to check for updates.")
 
 def display_keys():
-    print("")
-    print("Current keys:")
-    print("")
+    print_message("Current keys:")
     for i, key in enumerate(KEYS):
         print(f"{i}-{key[:3]}x.")
-    print("")
 
 def decrypt_text(user_input):
     global KEYS
     parts = user_input.split(' ')
     if len(parts) < 2:
-        print("")
-        print("Invalid input format.")
-        print("")
+        print_message("Invalid input format.")
         return
 
     text = parts[1]
@@ -282,9 +213,7 @@ def decrypt_text(user_input):
         if 0 <= key_number < len(KEYS):
             keys_to_try = [KEYS[key_number]]
         else:
-            print("")
-            print(f"Invalid key number: {key_number}")
-            print("")
+            print_message(f"Invalid key number: {key_number}")
             return
     else:
         keys_to_try = KEYS
@@ -303,9 +232,7 @@ def decrypt_text(user_input):
             continue
 
     for result in decryption_results:
-        print("")
-        print(result)
-        print("")
+        print_message(result)
         save_history(result)
 
 def encrypt_text(plaintext):
@@ -314,9 +241,7 @@ def encrypt_text(plaintext):
     plaintext_bytes = utf16be_to_bytes(plaintext)
     ciphertext_bytes = rc4_encrypt(key_bytes, plaintext_bytes)
     ciphertext_hex = bytes_to_hex(ciphertext_bytes)
-    print("")
-    print(f"Encrypted text: {ciphertext_hex}")
-    print("")
+    print_message(f"Encrypted text: {ciphertext_hex}")
     save_history(f"Encrypted text: {ciphertext_hex} with key {key[:3]}")
 
 def bruteforce_decrypt(ciphertext):
@@ -337,15 +262,6 @@ def bruteforce_decrypt(ciphertext):
                     continue
 
     print("Bruteforce decryption completed. Results saved in rcs_opt.md")
-
-
-def generate_keys(charset, length):
-    if length == 0:
-        yield ""
-    else:
-        for char in charset:
-            for key in generate_keys(charset, length - 1):
-                yield char + key
 
 if __name__ == "__main__":
     load_keys()
