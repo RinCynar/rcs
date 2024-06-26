@@ -10,7 +10,7 @@ RCS_FOLDER = ".rcs"
 KEY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_keys")
 HISTORY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_hst")
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.67
+RCS_VER = 1.69
 DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcs.py"
 UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
 
@@ -291,8 +291,9 @@ def interactive_mode():
     load_keys()
     if not os.path.exists(history_file):
         open(history_file, "wb").close()
-        print(f"\nUser: {username} created")
-        print(f"Enter as {username}\n")
+        print(f"User: {username} created")
+
+    print(f"Enter as {username}\n")
 
     latest_version = check_for_updates()
     if latest_version:
