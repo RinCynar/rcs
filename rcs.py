@@ -9,7 +9,7 @@ KEYS = [DEFAULT_KEY]
 KEY_FILE = ".rcs_keys"
 HISTORY_FILE = ".rcs_hst"
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.56
+RCS_VER = 1.59
 DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcs.py"
 UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
 
@@ -258,6 +258,25 @@ def encrypt_text(plaintext):
     print_message(f"Encrypted text: {ciphertext_hex}")
     save_history(f"Encrypted text: {ciphertext_hex} with key {key[:3]}")
 
+def bruteforce_decrypt(ciphertext):
+    character_set = "`~!@#$%^&*()-=_+[]\\{}|;':"",./<>?0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    min_length = int(input("Enter minimum key length: "))
+    max_length = int(input("Enter maximum key length: "))
+
+    with open(OPT_FILE, "w") as output_file:
+        for length in range(min_length, max_length + 1):
+            print(f"Trying keys of length {length}...")
+            for attempt in itertools.product(character_set, repeat=length):
+                key = ''.join(attempt)
+                try:
+                    decrypted_text = rc4_decrypt(utf16be_to_bytes(key), hex_to_bytes(ciphertext))
+                    decrypted_text = decrypted_text.decode('utf-16be').rstrip('\x00')
+                    output_file.write(f"Key: {key}, Decrypted text: {decrypted_text}\n")
+                except Exception as e:
+                    continue
+
+    print("Bruteforce decryption completed. Results saved in rcs_opt.md\n")
+    
 if __name__ == "__main__":
     load_keys()
     interactive_mode()
