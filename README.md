@@ -251,4 +251,4 @@ The RCS tool provides a user-friendly interface with intuitive commands, making 
 
 ## License
 
-RCS is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+RCS is licensed under the MIT License. See the [LICENSE](https://github.com/RinCynar/rcs/blob/main/LICENSE) file for more information.
