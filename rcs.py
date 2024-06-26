@@ -10,7 +10,7 @@ RCS_FOLDER = ".rcs"
 KEY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_keys")
 HISTORY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_hst")
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.69-fx0
+RCS_VER = 1.70
 DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcs.py"
 UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
 
