@@ -249,6 +249,11 @@ The tool includes a brute-force decryption feature that allows users to attempt 
 
 The RCS tool provides a user-friendly interface with intuitive commands, making it easy for users to encrypt and decrypt text, manage keys, and view history without needing advanced technical knowledge.
 
+## Support and feedback
+
+If you have any questions or need help, please contact the development team: `rincynar@gmail.com`
+Thank you for using the `rcs` tool software!
+
 ## License
 
 RCS is licensed under the MIT License. See the [LICENSE](https://github.com/RinCynar/rcs/blob/main/LICENSE) file for more information.
