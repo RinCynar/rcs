@@ -11,9 +11,9 @@ RCS_FOLDER = ".rcs"
 KEY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_keys")
 HISTORY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_hst")
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.70
-DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcs.py"
-UPDATE_URL = "http://rcva.san.tc/assets/rcs.html"
+RCS_VER = 1.71
+DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcnr/rcs.py"
+UPDATE_URL = "http://rcs.rcva.san.tc"
 
 username = ""
 
@@ -251,12 +251,13 @@ def handle_command(user_input):
         if latest_version:
             if latest_version > RCS_VER:
                 print_message(
-                    f"New version {latest_version} is available! Download it here: {DOWNLOAD_LINK}"
+                    f"{latest_version}"
                 )
             else:
                 print_message("You are using the latest version.")
         else:
-            print_message("Failed to check for updates.")
+            print_message(
+                "Failed to check for updates. If there haven't any network problems, please view https://rcva.san.tc")
     elif user_input.startswith("- "):
         decrypt_text(user_input)
     else:
@@ -300,7 +301,7 @@ def interactive_mode():
     if latest_version:
         if latest_version > RCS_VER:
             print_message(
-                f"A new version {latest_version} is available! Download it here: {DOWNLOAD_LINK}"
+                f"{latest_version}"
             )
 
     while True:
