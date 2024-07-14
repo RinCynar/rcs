@@ -10,7 +10,7 @@ RCS_FOLDER = ".rcs"
 KEY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_keys")
 HISTORY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_hst")
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.71
+RCS_VER = 1.72
 DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcnr/rcs.py"
 UPDATE_URL = "http://rcs.rcva.san.tc"
 
@@ -205,58 +205,74 @@ def clear_history():
         print_message("No history records to clear.")
 
 
+def extract_version_and_link(update_info):
+    parts = update_info.split(" ")
+    version_str = parts[2]
+    download_link = parts[-1]
+    return version_str, download_link
+
+
 def check_for_updates():
     try:
         response = requests.get(UPDATE_URL)
         response.raise_for_status()
-        latest_version = float(response.text.strip())
-        return latest_version
+        update_info = response.text.strip()
+        version_str, download_link = extract_version_and_link(update_info)
+        latest_version = float(version_str)
+        return latest_version, download_link
     except requests.RequestException:
-        return None
+        return None, None
 
 
 def handle_command(user_input):
     global username
-    if user_input.lower() == "rcs-exi":
+    if user_input.lower() == "rxit":
         return False
-    elif user_input.lower() == "rcs-help":
+    elif user_input.lower() == "relp":
         print_help()
-    elif user_input.startswith("rcs-adk"):
-        new_key = user_input.split(" ", 1)[1]
-        add_key(new_key)
-    elif user_input.startswith("rcs-dek"):
+    elif user_input.startswith("rak"):
+        if len(user_input.split()) > 1:
+            new_key = user_input.split(" ", 1)[1]
+            add_key(new_key)
+        else:
+            print_message("Invalid input format for rak command.")
+    elif user_input.startswith("rdk"):
         parts = user_input.split()
-        if len(parts) == 2 and parts[0] == "rcs-dek" and parts[1].startswith("-"):
+        if len(parts) == 2 and parts[0] == "rdk" and parts[1].startswith("-"):
             key_number = parts[1][1:]
             delete_key(key_number)
         else:
             print_message(
-                "Invalid input format for rcs-dek command. Format should be: rcs-dek -<key_number>"
+                "Invalid input format for rdk command. Format should be: rdk -<key_number>"
             )
-    elif user_input.lower() == "rcs-res":
+    elif user_input.lower() == "res":
         reset()
-    elif user_input.lower() == "rcs-cuk":
+    elif user_input.lower() == "rck":
         display_keys()
         print("")
-    elif user_input.startswith("rcs-pod"):
-        text_to_crack = user_input.split(" ", 1)[1]
-        bruteforce_decrypt(text_to_crack)
-    elif user_input.lower() == "rcs-hst":
+    elif user_input.startswith("rc "):
+        if len(user_input.split()) > 1:
+            text_to_crack = user_input.split(" ", 1)[1]
+            bruteforce_decrypt(text_to_crack)
+        else:
+            print_message("Invalid input format for rc command.")
+    elif user_input.lower() == "rsh":
         display_history()
-    elif user_input.lower() == "rcs-cle":
+    elif user_input.lower() == "rch":
         clear_history()
-    elif user_input.lower() == "rcs-udt":
-        latest_version = check_for_updates()
-        if latest_version:
+    elif user_input.lower() == "rcu":
+        try:
+            latest_version, download_link = check_for_updates()
             if latest_version > RCS_VER:
-                print_message(
-                    f"{latest_version}"
+                print(
+                    f"A newer version {latest_version} is available. Download it from {download_link}."
                 )
             else:
-                print_message("You are using the latest version.")
-        else:
-            print_message(
-                "Failed to check for updates. If there haven't any network problems, please view https://rcva.san.tc")
+                print("You are using the latest version.")
+        except Exception:
+            print(
+                "Failed to check for updates. If there haven't any network problems, please view https://rcva.san.tc"
+            )
     elif user_input.startswith("- "):
         decrypt_text(user_input)
     else:
@@ -268,7 +284,7 @@ def interactive_mode():
     global username
 
     print_message(
-        f"rcs {RCS_VER}, a text encryption tool based on RC4 encryption algorithm\nhttp://rcva.san.tc, Rin' Cynar\nType 'rcs-help' for usage instructions"
+        f"rcs {RCS_VER}, a text encryption tool based on RC4 encryption algorithm\nhttp://rcva.san.tc, Rin' Cynar\nType 'relp' for usage instructions"
     )
 
     username = get_input("Enter your username: ")
@@ -289,35 +305,41 @@ def interactive_mode():
         with open(key_file, "wb") as file:
             file.write(encrypted_username)
 
-    load_keys()
     if not os.path.exists(history_file):
-        open(history_file, "wb").close()
-        print(f"User: {username} created")
+        encrypted_username = (
+            rc4_encrypt(username.encode("utf-16"), username.encode("utf-16")) + b"\n"
+        )
+        with open(history_file, "wb") as file:
+            file.write(encrypted_username)
 
-    print(f"Enter as {username}\n")
-
-    latest_version = check_for_updates()
-    if latest_version:
-        if latest_version > RCS_VER:
-            print_message(
-                f"{latest_version}"
-            )
+    load_keys()
 
     while True:
-        try:
-            user_input = input("# ").strip()
-            if not handle_command(user_input):
-                break
-        except Exception as e:
-            print_message(f"Error: {str(e)}")
-
+        user_input = input("\n>> ").strip()
+        if not user_input:
+            continue
+        if not handle_command(user_input):
+            break
 
 def print_help():
-    print_message(
-        "Provide the text and press 'Enter', rcs will automatically perform the encryption work, you can choose the key to use for encryption, or just simply press 'Enter' again to use the default options.\nEnter '- <text> -<key_number>' and press Enter, rcs will use the key you specified to decrypt. Of course, you can choose to simply enter '- <text>', rcs will try all the keys that have been saved and return the results.\nType 'rcs-adk <new-key>' to add a new encryption key.\nType 'rcs-cle' to clear encryption/decryption history.\nType 'rcs-cuk' to display the currently saved encryption keys\nType 'rcs-dek -<key_number>' to delete a specified encryption key.\nType 'rcs-exi' to exit.\nType 'rcs-hst' to display encryption/decryption history.\nType 'rcs-pod <text>' to perform a brute force decryption on the specified text.\nType 'rcs-res' to reset default configuration.\nType 'rcs-udt' to check for updates."
+    print(
+        """
+Commands:
+  <text>           Encrypt <text>
+  - <text>         Decrypt <text>
+  rxit             Exit RCS
+  relp             Display this help message
+  rak <key>        Add a Key
+  rdk -<num>       Delete a Key
+  res              Restore
+  rck              Display Current Keys
+  rc <text>        Crack the text
+  rsh              Show History
+  rch              Clear History
+  rcu              Check for Updates
+    """
     )
-
-
+    
 def display_keys():
     global username
     print_message("Current keys:")
@@ -399,4 +421,7 @@ def bruteforce_decrypt(ciphertext):
 
 
 if __name__ == "__main__":
-    interactive_mode()
+    if len(sys.argv) > 1 and sys.argv[1] == "-i":
+        interactive_mode()
+    else:
+        print("Usage: rcs -i for interactive mode")

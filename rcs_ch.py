@@ -10,9 +10,7 @@ RCS_FOLDER = ".rcs"
 KEY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_keys")
 HISTORY_FILE_TEMPLATE = os.path.join(RCS_FOLDER, "{}.rcs_hst")
 OPT_FILE = "rcs_opt.md"
-RCS_VER = 1.71
-DOWNLOAD_LINK = "https://rcva.san.tc/assets/file/rcs.py"
-UPDATE_URL = "http://rcs.rcva.san.tc/"
+RCS_VER = 1.72
 
 username = ""
 
@@ -244,17 +242,6 @@ def handle_command(user_input):
         display_history()
     elif user_input.lower() == "黃泉":
         clear_history()
-    elif user_input.lower() == "嘗試躍遷":
-        latest_version = check_for_updates()
-        if latest_version:
-            if latest_version > RCS_VER:
-                print_message(
-                    f"星際和平公司提醒您：{latest_version} "
-                )
-            else:
-                print_message("星際和平公司提醒您：聯覺信標已是最新版本.")
-        else:
-            print_message("維里塔斯-拉帝奧 很苦惱的樣子啊,遇到麻煩了?既然如此--你自己想辦法吧.")
     elif user_input.startswith("- "):
         decrypt_text(user_input)
     else:
@@ -265,7 +252,7 @@ def handle_command(user_input):
 def interactive_mode():
     global username
     
-    print("---For entertainment only, it is recommended to use the official version---")
+    print("---Based on 1.70. For entertainment only, it is recommended to use the official version---")
     print_message(
         f"聯覺信標{RCS_VER}, \nhttp://rcva.san.tc, Rin' Cynar\n瓦爾特-楊 無論何時需要幫助，「帕姆」都會及時趕到，不過請不要故意尋它開心，上一個這麼做的人已經......"
     )
@@ -294,13 +281,6 @@ def interactive_mode():
         print(f"姬子 歡迎上車，{username} .")
 
     print(f"帕姆 {username}你回來啦！ ...\n帕姆 嗯，身上有些掛彩，在外面吃了不少苦頭吧？要準備醫療用品......\n帕姆 看你風塵僕僕的樣子，估計肚子也餓了，餐車上的食物也得補貨了.\n帕姆 走進來又是一地灰塵，晚點得打掃一遍.\n帕姆 好啦就這樣了，謝謝{username}乘客的配合！ \n")
-
-    latest_version = check_for_updates()
-    if latest_version:
-        if latest_version > RCS_VER:
-            print_message(
-                f"星際和平公司提醒您：{latest_version} "
-            )
 
     while True:
         try:
