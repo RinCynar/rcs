@@ -38,16 +38,16 @@ python rcs.py
 
 ### Commands
 
-- `rcs-help`: Display usage instructions.
-- `rcs-adk <new-key>`: Add a new encryption key.
-- `rcs-cle`: Clear encryption/decryption history.
-- `rcs-cuk`: Display the currently saved encryption keys.
-- `rcs-dek -<key_number>`: Delete a specified encryption key.
-- `rcs-exi`: Exit the tool.
-- `rcs-hst`: Display encryption/decryption history.
-- `rcs-pod <text>`: Perform a brute-force decryption on the specified text.
-- `rcs-res`: Reset to default configuration.
-- `rcs-udt`: Check for updates.
+- `relp`: Display usage instructions.
+- `rak <new-key>`: Add a new encryption key.
+- `rch`: Clear encryption/decryption history.
+- `rck`: Display the currently saved encryption keys.
+- `rdk -<key_number>`: Delete a specified encryption key.
+- `rxit`: Exit the tool.
+- `rsh`: Display encryption/decryption history.
+- `rc <text>`: Perform a brute-force decryption on the specified text.
+- `res`: Reset to default configuration.
+- `rcu`: Check for updates.
 
 ## Functions
 
