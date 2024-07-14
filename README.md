@@ -202,7 +202,7 @@ Performs a brute-force decryption attempt on the provided ciphertext using keys 
 2. Add a new key:
 
    ```
-   # rcs-adk my-new-key
+   # rak my-new-key
    ```
 
 ### Displaying History
@@ -216,7 +216,7 @@ Performs a brute-force decryption attempt on the provided ciphertext using keys 
 2. Display the history of encrypted and decrypted messages:
 
    ```
-   # rcs-hst
+   # rsh
    ```
 
 ## Feature Highlights
